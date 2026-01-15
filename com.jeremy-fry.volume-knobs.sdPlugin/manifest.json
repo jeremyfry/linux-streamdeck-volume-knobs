@@ -1,0 +1,84 @@
+{
+	"Name": "volume-knobs",
+	"Version": "0.1.0.0",
+	"Author": "Jeremy Fry",
+	"Actions": [
+		{
+			"Name": "Volume Mute",
+			"UUID": "com.jeremy-fry.volume-knobs.mute",
+			"Icon": "imgs/actions/volume-mute/icon",
+			"Tooltip": "Toggle mute for system or application audio.",
+			"PropertyInspectorPath": "ui/volume-mute.html",
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"Image": "imgs/actions/volume-mute/key",
+					"TitleAlignment": "middle"
+				}
+			]
+		},
+		{
+			"Name": "Volume Dial",
+			"UUID": "com.jeremy-fry.volume-knobs.volume-dial",
+			"Icon": "imgs/actions/volume-dial/icon",
+			"Tooltip": "Control volume with dial rotation. Press to toggle mute.",
+			"PropertyInspectorPath": "ui/volume-dial.html",
+			"Controllers": [
+				"Encoder"
+			],
+			"Encoder": {
+				"Icon": "imgs/actions/volume-dial/encoder-icon",
+				"Rotate": {
+					"Description": "Rotate to adjust volume"
+				},
+				"Push": {
+					"Description": "Press to toggle mute"
+				}
+			},
+			"States": [
+				{
+					"Image": "imgs/actions/volume-dial/key",
+					"TitleAlignment": "middle"
+				}
+			]
+		},
+		{
+			"Name": "Set Volume",
+			"UUID": "com.jeremy-fry.volume-knobs.set-volume",
+			"Icon": "imgs/actions/set-volume/icon",
+			"Tooltip": "Set volume to a specific level for system or application audio.",
+			"PropertyInspectorPath": "ui/set-volume.html",
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"Image": "imgs/actions/set-volume/key",
+					"TitleAlignment": "middle"
+				}
+			]
+		}
+	],
+	"Category": "volume-knobs",
+	"CategoryIcon": "imgs/plugin/category-icon",
+	"CodePath": "bin/plugin.js",
+	"Description": "Allows control of volume on Linux",
+	"Icon": "imgs/plugin/marketplace",
+	"SDKVersion": 3,
+	"Software": {
+		"MinimumVersion": "6.9"
+	},
+	"OS": [
+		{
+			"Platform": "linux",
+			"MinimumVersion": "5.0"
+		}
+	],
+	"Nodejs": {
+		"Version": "20",
+		"Debug": "enabled"
+	},
+	"UUID": "com.jeremy-fry.volume-knobs"
+}

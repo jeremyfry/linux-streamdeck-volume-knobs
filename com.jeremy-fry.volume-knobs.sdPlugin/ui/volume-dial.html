@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <title>Volume Dial Settings</title>
+    <meta charset="utf-8" />
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            padding: 20px;
+            margin: 0;
+            background: #1e1e1e;
+            color: #d4d4d4;
+        }
+        .setting-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        select, input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            background: #252526;
+            border: 1px solid #3e3e42;
+            color: #d4d4d4;
+            border-radius: 4px;
+            font-size: 13px;
+            box-sizing: border-box;
+        }
+        select:focus, input:focus {
+            outline: none;
+            border-color: #007acc;
+        }
+        input[type="range"] {
+            width: 100%;
+        }
+        .range-value {
+            display: inline-block;
+            margin-left: 10px;
+            min-width: 40px;
+        }
+        #appSinkIdItem {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="setting-group">
+        <label for="controlMode">Control Mode</label>
+        <select id="controlMode">
+            <option value="system">System</option>
+            <option value="application">Application</option>
+        </select>
+    </div>
+
+    <div class="setting-group" id="appSinkIdItem">
+        <label for="appSinkId">Application Sink ID</label>
+        <input type="text" id="appSinkId" placeholder="Enter sink ID or name" />
+    </div>
+
+    <div class="setting-group">
+        <label for="stepSize">
+            Step Size (% per tick)
+            <span class="range-value" id="stepSizeValue">2</span>
+        </label>
+        <input type="range" id="stepSize" min="1" max="10" step="1" value="2" />
+    </div>
+
+    <script>
+        let websocket = null;
+        let uuid = null;
+        let actionInfo = null;
+
+        function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, inActionInfo) {
+            uuid = inUUID;
+            actionInfo = JSON.parse(inActionInfo);
+            
+            websocket = new WebSocket('ws://localhost:' + inPort);
+            
+            websocket.onopen = function() {
+                const json = {
+                    event: inRegisterEvent,
+                    uuid: inUUID
+                };
+                websocket.send(JSON.stringify(json));
+                
+                // Request current settings
+                const getSettings = {
+                    event: 'getSettings',
+                    context: uuid
+                };
+                websocket.send(JSON.stringify(getSettings));
+            };
+
+            websocket.onmessage = function(evt) {
+                const jsonObj = JSON.parse(evt.data);
+                
+                if (jsonObj.event === 'didReceiveSettings') {
+                    const settings = jsonObj.payload.settings || {};
+                    updateUI(settings);
+                }
+            };
+        }
+
+        function updateUI(settings) {
+            // Update control mode
+            const controlMode = settings.controlMode || 'system';
+            document.getElementById('controlMode').value = controlMode;
+            
+            // Update app sink ID
+            document.getElementById('appSinkId').value = settings.appSinkId || '';
+            
+            // Update step size
+            const stepSize = settings.stepSize || 2;
+            document.getElementById('stepSize').value = stepSize;
+            document.getElementById('stepSizeValue').textContent = stepSize;
+            
+            // Show/hide app sink ID field
+            const appSinkIdItem = document.getElementById('appSinkIdItem');
+            appSinkIdItem.style.display = controlMode === 'application' ? 'block' : 'none';
+        }
+
+        function saveSettings() {
+            if (!websocket || websocket.readyState !== WebSocket.OPEN) return;
+            
+            const newSettings = {
+                controlMode: document.getElementById('controlMode').value,
+                appSinkId: document.getElementById('appSinkId').value || undefined,
+                stepSize: parseInt(document.getElementById('stepSize').value, 10)
+            };
+            
+            const json = {
+                event: 'setSettings',
+                context: uuid,
+                payload: newSettings
+            };
+            websocket.send(JSON.stringify(json));
+        }
+
+        // Event listeners
+        document.getElementById('controlMode').addEventListener('change', function() {
+            const appSinkIdItem = document.getElementById('appSinkIdItem');
+            appSinkIdItem.style.display = this.value === 'application' ? 'block' : 'none';
+            saveSettings();
+        });
+
+        document.getElementById('appSinkId').addEventListener('input', function() {
+            saveSettings();
+        });
+
+        document.getElementById('stepSize').addEventListener('input', function() {
+            document.getElementById('stepSizeValue').textContent = this.value;
+            saveSettings();
+        });
+    </script>
+</body>
+
+</html>
