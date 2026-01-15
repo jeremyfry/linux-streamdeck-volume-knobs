@@ -46,6 +46,21 @@
         #appSinkIdItem {
             display: none;
         }
+        .warning {
+            background: #3d3d00;
+            border: 1px solid #6d6d00;
+            border-radius: 4px;
+            padding: 12px;
+            margin-top: 10px;
+            color: #ffd700;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        .warning-icon {
+            display: inline-block;
+            margin-right: 6px;
+            font-weight: bold;
+        }
     </style>
 </head>
 
@@ -56,11 +71,17 @@
             <option value="system">System</option>
             <option value="application">Application</option>
         </select>
+        <div class="warning" id="applicationWarning" style="display: none;">
+            <span class="warning-icon">⚠</span>
+            Application volume can only be controlled when the application is playing audio. WirePlumber does not expose the stream when the application is not playing.
+        </div>
     </div>
 
     <div class="setting-group" id="appSinkIdItem">
-        <label for="appSinkId">Application Sink ID</label>
-        <input type="text" id="appSinkId" placeholder="Enter sink ID or name" />
+        <label for="appSinkId">Application</label>
+        <select id="appSinkId" style="width: 100%;">
+            <option value="">Select an application...</option>
+        </select>
     </div>
 
     <div class="setting-group">
@@ -95,16 +116,48 @@
                     context: uuid
                 };
                 websocket.send(JSON.stringify(getSettings));
+                
+                // Application list will be sent automatically when Property Inspector appears
+                // No need to request it manually
             };
 
             websocket.onmessage = function(evt) {
                 const jsonObj = JSON.parse(evt.data);
+                console.log('Property Inspector received:', jsonObj);
                 
                 if (jsonObj.event === 'didReceiveSettings') {
                     const settings = jsonObj.payload.settings || {};
                     updateUI(settings);
+                } else if (jsonObj.event === 'sendToPropertyInspector') {
+                    // Message from plugin
+                    const payload = jsonObj.payload;
+                    if (payload.event === 'applicationsList') {
+                        populateApplicationList(payload.applications);
+                    } else if (payload.event === 'applicationsListError') {
+                        console.error('Error loading applications:', payload.error);
+                        document.getElementById('appSinkId').innerHTML = '<option value="">Error loading applications</option>';
+                    }
                 }
             };
+        }
+
+        function populateApplicationList(applications) {
+            const select = document.getElementById('appSinkId');
+            const currentValue = select.value;
+            
+            select.innerHTML = '<option value="">Select an application...</option>';
+            
+            applications.forEach(app => {
+                const option = document.createElement('option');
+                option.value = app.processName;
+                option.textContent = app.name;
+                option.setAttribute('data-icon', app.icon || '');
+                select.appendChild(option);
+            });
+            
+            if (currentValue) {
+                select.value = currentValue;
+            }
         }
 
         function updateUI(settings) {
@@ -113,16 +166,22 @@
             document.getElementById('controlMode').value = controlMode;
             
             // Update app sink ID
-            document.getElementById('appSinkId').value = settings.appSinkId || '';
+            const appSelect = document.getElementById('appSinkId');
+            if (settings.appSinkId) {
+                appSelect.value = settings.appSinkId;
+            }
             
             // Update target volume
             const targetVolume = settings.targetVolume || 50;
             document.getElementById('targetVolume').value = targetVolume;
             document.getElementById('targetVolumeValue').textContent = targetVolume;
             
-            // Show/hide app sink ID field
+            // Show/hide app sink ID field and warning
             const appSinkIdItem = document.getElementById('appSinkIdItem');
-            appSinkIdItem.style.display = controlMode === 'application' ? 'block' : 'none';
+            const applicationWarning = document.getElementById('applicationWarning');
+            const isApplication = controlMode === 'application';
+            appSinkIdItem.style.display = isApplication ? 'block' : 'none';
+            applicationWarning.style.display = isApplication ? 'block' : 'none';
         }
 
         function saveSettings() {
@@ -145,11 +204,30 @@
         // Event listeners
         document.getElementById('controlMode').addEventListener('change', function() {
             const appSinkIdItem = document.getElementById('appSinkIdItem');
-            appSinkIdItem.style.display = this.value === 'application' ? 'block' : 'none';
+            const applicationWarning = document.getElementById('applicationWarning');
+            const isApplication = this.value === 'application';
+            appSinkIdItem.style.display = isApplication ? 'block' : 'none';
+            applicationWarning.style.display = isApplication ? 'block' : 'none';
             saveSettings();
         });
 
-        document.getElementById('appSinkId').addEventListener('input', function() {
+        document.getElementById('appSinkId').addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const iconPath = selectedOption.getAttribute('data-icon') || '';
+            
+            // Send icon to plugin for storage
+            if (iconPath && websocket && websocket.readyState === WebSocket.OPEN) {
+                const setIcon = {
+                    event: 'sendToPlugin',
+                    context: uuid,
+                    payload: {
+                        event: 'setAppIcon',
+                        icon: iconPath
+                    }
+                };
+                websocket.send(JSON.stringify(setIcon));
+            }
+            
             saveSettings();
         });
 
