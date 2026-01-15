@@ -2,10 +2,10 @@
     "scripts": {
         "build": "rollup -c",
         "build:debug": "DEBUG=true rollup -c",
-        "watch": "rollup -c -w --watch.onEnd=\"streamdeck restart com.jeremy-fry.volume-knobs\"",
-        "watch:debug": "DEBUG=true rollup -c -w --watch.onEnd=\"streamdeck restart com.jeremy-fry.volume-knobs\"",
-        "package": "npm run build && zip -r volume-knobs.sdPlugin.zip com.jeremy-fry.volume-knobs.sdPlugin -x 'com.jeremy-fry.volume-knobs.sdPlugin/logs/*'",
-        "package:debug": "DEBUG=true npm run build && zip -r volume-knobs.sdPlugin.zip com.jeremy-fry.volume-knobs.sdPlugin -x 'com.jeremy-fry.volume-knobs.sdPlugin/logs/*'"
+        "watch": "rollup -c -w --watch.onEnd=\"streamdeck restart com.jeremy-fry.volume-dials\"",
+        "watch:debug": "DEBUG=true rollup -c -w --watch.onEnd=\"streamdeck restart com.jeremy-fry.volume-dials\"",
+        "package": "npm run build && zip -r volume-dials.sdPlugin.zip com.jeremy-fry.volume-dials.sdPlugin -x 'com.jeremy-fry.volume-dials.sdPlugin/logs/*'",
+        "package:debug": "DEBUG=true npm run build && zip -r volume-dials.sdPlugin.zip com.jeremy-fry.volume-dials.sdPlugin -x 'com.jeremy-fry.volume-dials.sdPlugin/logs/*'"
     },
     "type": "module",
     "devDependencies": {

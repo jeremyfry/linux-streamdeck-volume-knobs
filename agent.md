@@ -1,6 +1,6 @@
-# Volume Knobs Plugin - Agent Documentation
+# Volume Dials Plugin - Agent Documentation
 
-This document provides context and decisions made during the development of the volume-knobs StreamDeck plugin for Linux/OpenDeck.
+This document provides context and decisions made during the development of the volume-dials StreamDeck plugin for Linux/OpenDeck.
 
 ## Project Overview
 
@@ -47,7 +47,7 @@ A StreamDeck plugin that controls system and application audio volume on Linux u
 - **Decision**: Include comprehensive debug logging that can be enabled/disabled
 - **Rationale**: Essential for debugging on Linux where tools may be limited
 - **Implementation**:
-  - Controlled by `DEBUG=true` or `VOLUME_KNOBS_DEBUG=true` environment variable
+  - Controlled by `DEBUG=true` or `VOLUME_DIALS_DEBUG=true` environment variable
   - Runtime check (not baked into build)
   - Logs all wpctl commands, sink operations, and action events
   - Uses `streamDeck.logger` and `console.log/error` for dual output
@@ -64,7 +64,7 @@ A StreamDeck plugin that controls system and application audio volume on Linux u
 ## Application Structure
 
 ```
-volume-knobs/
+volume-dials/
 ├── src/
 │   ├── plugin.ts                 # Main entry point, registers actions
 │   ├── actions/
@@ -74,7 +74,7 @@ volume-knobs/
 │   └── utils/
 │       ├── volume-control.ts     # Core wpctl interaction functions
 │       └── debug.ts              # Debug logging utility
-├── com.jeremy-fry.volume-knobs.sdPlugin/
+├── com.jeremy-fry.volume-dials.sdPlugin/
 │   ├── manifest.json             # Plugin configuration
 │   ├── bin/
 │   │   └── plugin.js             # Compiled plugin (from rollup)
@@ -91,7 +91,7 @@ volume-knobs/
 
 ## Action Types
 
-### 1. Volume Dial (`com.jeremy-fry.volume-knobs.volume-dial`)
+### 1. Volume Dial (`com.jeremy-fry.volume-dials.volume-dial`)
 - **Controller**: Encoder (dial)
 - **Events**:
   - `onDialRotate`: Adjusts volume based on ticks and step size
@@ -101,7 +101,7 @@ volume-knobs/
   - `appSinkId`: Application name (when controlMode is "application")
   - `stepSize`: Volume change per tick (1-10%, default 2%)
 
-### 2. Volume Mute (`com.jeremy-fry.volume-knobs.mute`)
+### 2. Volume Mute (`com.jeremy-fry.volume-dials.mute`)
 - **Controller**: Keypad (button)
 - **Events**:
   - `onKeyDown`: Toggles mute
@@ -109,7 +109,7 @@ volume-knobs/
   - `controlMode`: "system" | "application"
   - `appSinkId`: Application name (when controlMode is "application")
 
-### 3. Set Volume (`com.jeremy-fry.volume-knobs.set-volume`)
+### 3. Set Volume (`com.jeremy-fry.volume-dials.set-volume`)
 - **Controller**: Keypad (button)
 - **Events**:
   - `onKeyDown`: Sets volume to target level
@@ -170,7 +170,7 @@ Set environment variable before running OpenDeck:
 ```bash
 DEBUG=true opendeck
 # or
-VOLUME_KNOBS_DEBUG=true opendeck
+VOLUME_DIALS_DEBUG=true opendeck
 ```
 
 ### What Gets Logged
@@ -199,7 +199,7 @@ VOLUME_KNOBS_DEBUG=true opendeck
 - `npm run package:debug`: Build with debug and create zip
 
 ### Packaging
-- Creates `volume-knobs.sdPlugin.zip` in project root
+- Creates `volume-dials.sdPlugin.zip` in project root
 - Includes: `manifest.json`, `bin/`, `imgs/`, `ui/`
 - Excludes: `logs/` directory
 

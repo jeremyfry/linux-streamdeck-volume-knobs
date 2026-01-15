@@ -17,7 +17,7 @@ type VolumeDialSettings = {
 /**
  * Action that controls volume via dial rotation and toggles mute on dial press.
  */
-@action({ UUID: "com.jeremy-fry.volume-knobs.volume-dial" })
+@action({ UUID: "com.jeremy-fry.volume-dials.volume-dial" })
 export class VolumeDial extends SingletonAction<VolumeDialSettings> {
 	/**
 	 * Update the button display when it becomes visible.

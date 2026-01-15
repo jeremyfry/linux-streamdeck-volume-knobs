@@ -10,7 +10,7 @@ streamDeck.logger.setLevel("trace");
 if (debug.isEnabled()) {
 	streamDeck.logger.info("[Plugin] Debug logging is ENABLED");
 } else {
-	streamDeck.logger.info("[Plugin] Debug logging is DISABLED (set DEBUG=true or VOLUME_KNOBS_DEBUG=true to enable)");
+	streamDeck.logger.info("[Plugin] Debug logging is DISABLED (set DEBUG=true or VOLUME_DIALS_DEBUG=true to enable)");
 }
 
 // Register volume dial action.

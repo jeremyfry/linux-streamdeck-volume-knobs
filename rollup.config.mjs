@@ -6,7 +6,7 @@ import path from "node:path";
 import url from "node:url";
 
 const isWatching = !!process.env.ROLLUP_WATCH;
-const sdPlugin = "com.jeremy-fry.volume-knobs.sdPlugin";
+const sdPlugin = "com.jeremy-fry.volume-dials.sdPlugin";
 
 /**
  * @type {import('rollup').RollupOptions}
