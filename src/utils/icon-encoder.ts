@@ -21,8 +21,9 @@ export async function encodeIconToBase64(iconPath: string | undefined): Promise<
 		// Try alternative locations
 		const alternatives = [
 			iconPath.replace("/128x128/", "/64x64/"),
-			iconPath.replace("/128x128/", "/48x48/"),
+			iconPath.replace("/128x128/", "/256x256/"),
 			iconPath.replace("/128x128/", "/32x32/"),
+			iconPath.replace("/128x128/", "/1024x1024/"),
 			iconPath.replace("/128x128/", "/"),
 		];
 		
